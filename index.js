@@ -9,7 +9,10 @@ const fs = require('fs');
 
 async function run() {
     try {
-        const token = core.getInput('github-token');
+        let token = core.getInput('github-token');
+        if (!token) {
+            token = process.env.GITHUB_TOKEN;
+        }
         const outputPath = core.getInput('output-path');
         // const targetPath = core.getInput('target-path');
         const octokit = github.getOctokit(token);
