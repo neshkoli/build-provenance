@@ -7,8 +7,8 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Run compiled index.js
-      run: node dist/index.js
+    - name: Run index.js
+      run: node index.js
       shell: bash
     - name: Display provenance.json
       run: cat provenance.json
