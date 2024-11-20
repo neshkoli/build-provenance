@@ -11,7 +11,7 @@ async function run() {
     try {
         const token = core.getInput('github-token');
         const outputPath = core.getInput('output-path');
-        const targetPath = core.getInput('target-path');
+        // const targetPath = core.getInput('target-path');
         const octokit = github.getOctokit(token);
         const context = github.context;
 
@@ -74,7 +74,7 @@ async function run() {
         core.setOutput('provenance-path', outputPath);
 
         // Upload provenance file using JFrog CLI
-        execSync(`echo ${outputPath} ${targetPath}`, { stdio: 'inherit' });
+        execSync(`echo ${outputPath}`, { stdio: 'inherit' });
 
     } catch (error) {
         core.setFailed(error.message);
