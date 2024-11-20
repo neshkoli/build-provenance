@@ -31826,10 +31826,14 @@ async function run() {
         if (!token) {
             token = process.env.GITHUB_TOKEN;
         }
-        const outputPath = core.getInput('output-path');
+        const outputPath = 'provenance.json';
         // const targetPath = core.getInput('target-path');
         const octokit = github.getOctokit(token);
         const context = github.context;
+
+        // Verify the token by fetching the authenticated user
+        const { data: user } = await octokit.rest.users.getAuthenticated();
+        console.log(`Authenticated as: ${user.login}`);
 
         // Collect build information
         const buildInfo = {

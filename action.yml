@@ -4,20 +4,12 @@ inputs:
   github-token:
     description: 'GitHub token'
     required: false
-    default: ${{ secrets.GITHUB_TOKEN }}
-  output-path:
-    description: 'Path to output the provenance file'
-    required: true
 runs:
   using: 'composite'
   steps:
-    - name: Set GITHUB_TOKEN environment variable
-      if: ${{ inputs.github-token == '' }}
-      run: echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
-      shell: bash
     - name: Run index.js
       run: node dist/index.js
       shell: bash
     - name: Display provenance.json
-      run: cat ${{ inputs.output-path }}
+      run: cat provenance.json
       shell: bash
