@@ -1,4 +1,4 @@
-// const { execSync } = require('child_process');
+const { execSync } = require('child_process');
 
 // Install dependencies
 // execSync('npm install @actions/core @actions/github jfrog-cli-go', { stdio: 'inherit' });

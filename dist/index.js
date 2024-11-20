@@ -31811,7 +31811,7 @@ module.exports = parseParams
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// const { execSync } = require('child_process');
+const { execSync } = __nccwpck_require__(5317);
 
 // Install dependencies
 // execSync('npm install @actions/core @actions/github jfrog-cli-go', { stdio: 'inherit' });
