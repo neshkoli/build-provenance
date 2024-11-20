@@ -1,16 +1,19 @@
-name: 'SLSA Provenance Generator'
-description: 'Generates SLSA provenance attestation in in-toto format'
+name: 'Build Provenance'
+description: 'Generate and display build provenance'
 inputs:
   github-token:
-    description: 'GitHub token for accessing repository information'
-    required: true
+    description: 'GitHub token'
+    required: false
+    default: ${{ secrets.GITHUB_TOKEN }}
   output-path:
-    description: 'Path where the provenance file will be written'
+    description: 'Path to output the provenance file'
     required: true
-  # target-path:
-  #   description: 'Target path for uploading the provenance file'
-  #   required: true
-
 runs:
-  using: 'node20'
-  main: 'dist/index.js'
+  using: 'composite'
+  steps:
+    - name: Run index.js
+      run: node dist/index.js
+      shell: bash
+    - name: Display provenance.json
+      run: cat ${{ inputs.output-path }}
+      shell: bash
