@@ -11,7 +11,7 @@ runs:
       run: node ${{ github.action_path }}/dist/index.js
       shell: bash
       env:
-        GITHUB_TOKEN: ${{ inputs.github-token || secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ inputs.github-token }}
     - name: Display provenance.json
       run: cat provenance.json
       shell: bash
