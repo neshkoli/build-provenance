@@ -10,6 +10,9 @@ async function run() {
         if (!token) {
             token = process.env.GITHUB_TOKEN;
         }
+        if (!token) {
+            throw new Error('GitHub token is required');
+        }
         const outputPath = 'provenance.json';
         // const targetPath = core.getInput('target-path');
         const octokit = github.getOctokit(token);

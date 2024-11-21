@@ -7,6 +7,10 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - name: Set GITHUB_TOKEN environment variable
+      if: ${{ inputs.github-token == '' }}
+      run: echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
+      shell: bash
     - name: Run compiled index.js
       run: node ${{ github.action_path }}/dist/index.js
       shell: bash
