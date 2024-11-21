@@ -3,7 +3,7 @@ description: 'Generate and display build provenance'
 inputs:
   github-token:
     description: 'GitHub token'
-    required: false
+    required: true
 runs:
   using: 'composite'
   steps:
