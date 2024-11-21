@@ -4,7 +4,7 @@
     "description": "Build Provenance evidence",
     "main": "index.js",
     "scripts": {
-      "build": "ncc build index.js --license licenses.txt && git push origin --delete v1 && git tag -d v1 && git tag -a -m 'v1' v1 && git push --follow-tag"
+      "build": "./build.sh"
     },
     "keywords": [],
     "author": "",
