@@ -1,17 +1,115 @@
-name: 'Build Provenance'
-description: 'Generate and display build provenance'
+# action.yml
+name: 'Evidence Generator for SLSA Build Provenance '
+description: 'Evidence Generator for SLSA Build Provenance v1.0 compliant'
 inputs:
-  github-token:
-    description: 'GitHub token'
+  artifact-path:
+    description: 'Path to the built artifact'
     required: true
+  output-path:
+    description: 'Path to store the provenance file'
+    required: false
+    default: 'provenance.json'
+  build-url:
+    description: 'URL of the build job'
+    required: false
+    default: '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+  builder-image:
+    description: 'Docker image used for building'
+    required: false
+    default: 'github-hosted'
+  install-jq:
+    description: 'Install jq if not present'
+    required: false
+    default: 'true'
+
+outputs:
+  provenance-path:
+    description: 'Path to the generated provenance file'
+    value: '${{ steps.generate-provenance.outputs.provenance-path }}'
+
 runs:
   using: 'composite'
   steps:
-    - name: Run compiled index.js
-      run: node ${{ github.action_path }}/dist/index.js
+    - name: Install JQ
+      if: ${{ inputs.install-jq == 'true' }}
+      shell: bash
+      run: |
+        # Ubuntu-specific jq installation
+        sudo apt-get update
+        sudo apt-get install -y jq
+
+    - name: Generate SLSA Provenance
+      id: generate-provenance
       shell: bash
       env:
-        GITHUB_TOKEN: ${{ inputs.github-token }}
-    - name: Display provenance.json
-      run: cat provenance.json
-      shell: bash
+        ARTIFACT_PATH: ${{ inputs.artifact-path }}
+        OUTPUT_PATH: ${{ inputs.output-path }}
+        BUILD_URL: ${{ inputs.build-url }}
+        BUILDER_IMAGE: ${{ inputs.builder-image }}
+      run: |
+        # Verify jq is installed
+        if ! command -v jq &> /dev/null; then
+          echo "Error: jq is not installed. Set install-jq to 'true' or pre-install jq."
+          exit 1
+        fi
+
+        # Calculate artifact digest
+        artifact_sha256=$(sha256sum "$ARTIFACT_PATH" | cut -d' ' -f1)
+
+        # Current timestamp in RFC 3339 format
+        build_timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+        # Generate full SLSA v1.0 compliant provenance
+        jq -n \
+          --arg buildTimestamp "$build_timestamp" \
+          --arg buildUrl "$BUILD_URL" \
+          --arg repo "$GITHUB_REPOSITORY" \
+          --arg sha "$GITHUB_SHA" \
+          --arg runId "$GITHUB_RUN_ID" \
+          --arg artifactSha "$artifact_sha256" \
+          --arg builderImage "$BUILDER_IMAGE" \
+          '{
+            "predicateType": "https://slsa.dev/provenance/v1",
+            "predicate": {
+              "buildDefinition": {
+                "buildType": "https://github.com/actions/workflow",
+                "externalParameters": {
+                  "workflow": "GitHub Actions",
+                  "ref": $sha,
+                  "repository": $repo
+                },
+                "resolvedDependencies": [
+                  {
+                    "uri": "git+https://github.com/\($repo)",
+                    "digest": {
+                      "sha1": $sha
+                    }
+                  }
+                ]
+              },
+              "runDetails": {
+                "builder": {
+                  "id": "https://github.com/actions/builder",
+                  "builderDependencies": [
+                    {
+                      "uri": $builderImage,
+                      "digest": {}
+                    }
+                  ]
+                },
+                "metadata": {
+                  "invocationId": $runId,
+                  "startedOn": $buildTimestamp,
+                  "finishedOn": $buildTimestamp
+                },
+                "byproducts": []
+              }
+            }
+          }' > "$OUTPUT_PATH"
+
+        # Output the path for subsequent steps
+        echo "provenance-path=$OUTPUT_PATH" >> "$GITHUB_OUTPUT"
+
+branding:
+  icon: 'shield'
+  color: 'green'
