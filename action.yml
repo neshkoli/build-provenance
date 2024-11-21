@@ -7,8 +7,8 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Run index.js
-      run: node index.js
+    - name: Run compiled index.js
+      run: node ${{ github.action_path }}/dist/index.js
       shell: bash
     - name: Display provenance.json
       run: cat provenance.json
