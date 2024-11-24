@@ -68,19 +68,33 @@ runs:
           --arg runId "$GITHUB_RUN_ID" \
           --arg artifactSha "$artifact_sha256" \
           --arg builderImage "$BUILDER_IMAGE" \
+          --arg ref "$GITHUB_REF" \
+          --arg eventName "$GITHUB_EVENT_NAME" \
+          --arg repoId "$GITHUB_REPOSITORY_ID" \
+          --arg repoOwnerId "$GITHUB_REPOSITORY_OWNER_ID" \
+          --arg runnerEnv "$RUNNER_ENVIRONMENT" \
           '{
-            "predicateType": "https://slsa.dev/provenance/v1",
-            "predicate": {
+
               "buildDefinition": {
-                "buildType": "https://github.com/actions/workflow",
+                "buildType": "https://actions.github.io/buildtypes/workflow/v1",
                 "externalParameters": {
-                  "workflow": "GitHub Actions",
-                  "ref": $sha,
-                  "repository": $repo
+                  "workflow": {
+                    "ref": $ref,
+                    "repository": "https://github.com/\($repo)",
+                    "path": $buildUrl
+                  }                 
+                },
+                "internalParameters": {
+                  "github": {
+                    "event_name": $eventName,
+                    "repository_id": $repoId,
+                    "repository_owner_id": $repoOwnerId,
+                    "runner_environment": $runnerEnv
+                  }
                 },
                 "resolvedDependencies": [
                   {
-                    "uri": "git+https://github.com/\($repo)",
+                    "uri": "git+https://github.com/\($repo)/\($ref)",
                     "digest": {
                       "sha1": $sha
                     }
@@ -104,7 +118,7 @@ runs:
                 },
                 "byproducts": []
               }
-            }
+
           }' > "$OUTPUT_PATH"
 
         # Output the path for subsequent steps
