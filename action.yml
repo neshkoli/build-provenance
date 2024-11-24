@@ -76,6 +76,7 @@ runs:
           --arg gitCommit "$GITHUB_SHA" \
           --arg builderId "https://github.com/$GITHUB_REPOSITORY/.github/workflows/build.yml@$GITHUB_REF" \
           --arg invocationId "https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/1" \
+          --arg workflowPath "${{ github.workflow }}" \
           '{
               "buildDefinition": {
                 "buildType": "https://actions.github.io/buildtypes/workflow/v1",
@@ -83,7 +84,7 @@ runs:
                   "workflow": {
                     "ref": $ref,
                     "repository": "https://github.com/\($repo)",
-                    "path": $buildUrl
+                    "path": $workflowPath
                   }                 
                 },
                 "internalParameters": {
@@ -111,10 +112,8 @@ runs:
                   "invocationId": $invocationId,
                   "startedOn": $buildTimestamp,
                   "finishedOn": $buildTimestamp
-                },
-                "byproducts": []
+                }
               }
-
           }' > "$OUTPUT_PATH"
 
         # Output the path for subsequent steps
