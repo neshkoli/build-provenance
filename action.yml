@@ -73,8 +73,10 @@ runs:
           --arg repoId "$GITHUB_REPOSITORY_ID" \
           --arg repoOwnerId "$GITHUB_REPOSITORY_OWNER_ID" \
           --arg runnerEnv "$RUNNER_ENVIRONMENT" \
+          --arg gitCommit "$GITHUB_SHA" \
+          --arg builderId "https://github.com/$GITHUB_REPOSITORY/.github/workflows/build.yml@$GITHUB_REF" \
+          --arg invocationId "https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/1" \
           '{
-
               "buildDefinition": {
                 "buildType": "https://actions.github.io/buildtypes/workflow/v1",
                 "externalParameters": {
@@ -94,25 +96,19 @@ runs:
                 },
                 "resolvedDependencies": [
                   {
-                    "uri": "git+https://github.com/\($repo)/\($ref)",
+                    "uri": "git+https://github.com/\($repo)@\($ref)",
                     "digest": {
-                      "sha1": $sha
+                      "gitCommit": $gitCommit
                     }
                   }
                 ]
               },
               "runDetails": {
                 "builder": {
-                  "id": "https://github.com/actions/builder",
-                  "builderDependencies": [
-                    {
-                      "uri": $builderImage,
-                      "digest": {}
-                    }
-                  ]
+                  "id": $builderId
                 },
                 "metadata": {
-                  "invocationId": $runId,
+                  "invocationId": $invocationId,
                   "startedOn": $buildTimestamp,
                   "finishedOn": $buildTimestamp
                 },
