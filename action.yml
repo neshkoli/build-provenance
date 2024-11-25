@@ -59,6 +59,10 @@ runs:
         # Current timestamp in RFC 3339 format
         build_timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
+        # Extract workflow path and ref
+        workflow_path=$(echo "$GITHUB_WORKFLOW_REF" | cut -d'@' -f1)
+        workflow_ref=$(echo "$GITHUB_WORKFLOW_REF" | cut -d'@' -f2)
+
         # Generate full SLSA v1.0 compliant provenance
         jq -n \
           --arg buildTimestamp "$build_timestamp" \
@@ -74,15 +78,16 @@ runs:
           --arg repoOwnerId "$GITHUB_REPOSITORY_OWNER_ID" \
           --arg runnerEnv "$RUNNER_ENVIRONMENT" \
           --arg gitCommit "$GITHUB_SHA" \
-          --arg builderId "https://github.com/$GITHUB_REPOSITORY/.github/workflows/build.yml@$GITHUB_REF" \
+          --arg builderId "$GITHUB_WORKFLOW_REF" \
           --arg invocationId "https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/1" \
-          --arg workflowPath "${{ github.workflow }}" \
+          --arg workflowPath "$workflow_path" \
+          --arg workflowRef "$workflow_ref" \
           '{
               "buildDefinition": {
                 "buildType": "https://actions.github.io/buildtypes/workflow/v1",
                 "externalParameters": {
                   "workflow": {
-                    "ref": $ref,
+                    "ref": $workflowRef,
                     "repository": "https://github.com/\($repo)",
                     "path": $workflowPath
                   }                 
@@ -120,5 +125,5 @@ runs:
         echo "provenance-path=$OUTPUT_PATH" >> "$GITHUB_OUTPUT"
 
 branding:
-  icon: 'shield'
+  icon: 'award'
   color: 'green'
