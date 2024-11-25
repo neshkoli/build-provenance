@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Build the project using ncc
-ncc build index.js --license licenses.txt
+# ncc build index.js --license licenses.txt
 
 # Commit the changes to GitHub
 git add .
