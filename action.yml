@@ -30,11 +30,8 @@ outputs:
 runs:
   using: 'composite'
   steps:
-    - name: Checkout action repository
+    - name: Checkout repository
       uses: actions/checkout@v2
-      with:
-        repository: ${{ github.action_path }}
-        path: action-repo
 
     - name: Install JQ
       if: ${{ inputs.install-jq == 'true' }}
@@ -53,20 +50,14 @@ runs:
         BUILD_URL: ${{ inputs.build-url }}
         BUILDER_IMAGE: ${{ inputs.builder-image }}
       run: |
-        # Verify jq is installed
-        if ! command -v jq &> /dev/null; then
-          echo "Error: jq is not installed. Set install-jq to 'true' or pre-install jq."
-          exit 1
-        fi
-
         # Calculate artifact digest
         artifact_sha256=$(sha256sum "$ARTIFACT_PATH" | cut -d' ' -f1)
 
         # Current timestamp in RFC 3339 format
         current_timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
-        # Run the JSON creation script
-        ./action-repo/generate_provenance.sh "$artifact_sha256" "$current_timestamp" 
+        # Source the JSON creation script
+        source ./generate_provenance.sh "$artifact_sha256" "$current_timestamp" 
 
         # Output the path for subsequent steps
         echo "provenance-path=$OUTPUT_PATH" >> "$GITHUB_OUTPUT"

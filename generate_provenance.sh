@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Verify jq is installed
+if ! command -v jq &> /dev/null; then
+    echo "Error: jq is not installed. Set install-jq to 'true' or pre-install jq."
+    exit 1
+fi
+
 artifact_sha=$1
 build_timestamp=$2
 
