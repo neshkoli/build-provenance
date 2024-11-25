@@ -30,6 +30,9 @@ outputs:
 runs:
   using: 'composite'
   steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
     - name: Install JQ
       if: ${{ inputs.install-jq == 'true' }}
       shell: bash
