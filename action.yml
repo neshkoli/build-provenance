@@ -57,7 +57,7 @@ runs:
         current_timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
         # Source the JSON creation script
-        source ./generate_provenance.sh "$artifact_sha256" "$current_timestamp" 
+        ${GITHUB_ACTION_PATH}/generate_provenance.sh "$artifact_sha256" "$current_timestamp" 
 
         # Output the path for subsequent steps
         echo "provenance-path=$OUTPUT_PATH" >> "$GITHUB_OUTPUT"
